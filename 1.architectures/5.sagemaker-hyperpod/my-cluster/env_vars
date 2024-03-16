@@ -1,0 +1,10 @@
+export AWS_REGION=eu-west-1
+export INSTANCES=g5.12xlarge
+export VPC_ID=vpc-03c6d8f07080d81d2
+export SUBNET_ID=subnet-0031c703c9af6b90f
+export PUBLIC_SUBNET_ID=subnet-08382ca3cdce5fd27
+export FSX_ID=fs-0095be77b07927494
+export FSX_MOUNTNAME=eeuq3bev
+export SECURITY_GROUP=sg-0533e34b5686f0dbd
+export ROLE=arn:aws:iam::106877348565:role/AmazonSagemakerExecutionRole
+export BUCKET=awsome-dtrain-sagemaker-lifecycle
