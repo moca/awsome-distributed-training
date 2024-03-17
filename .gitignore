@@ -1,3 +1,8 @@
+# SMHP to ignore 
+cluster-config.json
+env_vars
+provisioning_parameters.json
+
 .env.unversioned
 
 *.out

@@ -1,0 +1,1 @@
+python3 ../validate-config.py --cluster-config cluster-config.json --provisioning-parameters provisioning_parameters.json
