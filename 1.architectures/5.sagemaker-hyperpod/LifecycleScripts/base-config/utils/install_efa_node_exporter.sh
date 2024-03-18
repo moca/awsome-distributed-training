@@ -1,7 +1,11 @@
 #!/bin/bash
 
+DIR=awsome-distributed-training
 # Clone the repository
-git clone https://github.com/aws-samples/awsome-distributed-training.git || { echo "Failed to clone the repository"; exit 1; }
+if [ ! -d "$DIR" ]; then
+  git clone https://github.com/aws-samples/awsome-distributed-training.git || { echo "Failed to clone the repository"; exit 1; }
+fi
+
 # Change directory to the desired location
 cd awsome-distributed-training/4.validation_and_observability/3.efa-node-exporter || { echo "Failed to change directory"; exit 1; }
 

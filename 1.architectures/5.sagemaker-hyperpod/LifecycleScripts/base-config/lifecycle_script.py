@@ -9,7 +9,18 @@ import subprocess
 import sys
 import time
 from typing import Any, Dict, List, Optional, Tuple
+import logging
 
+# Set up logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(message)s')
+
+# Set up console handler
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.DEBUG)
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
 
 SLURM_CONF = os.getenv("SLURM_CONF", "/opt/slurm/etc/slurm.conf")
 
@@ -24,10 +35,18 @@ class ExecuteBashScript:
         self.script_name = script_name
 
     def run(self, *args):
-        print(f"Execute script: {self.script_name} {' '.join([str(x) for x in args])}")
-        result = subprocess.run(["sudo", "bash", self.script_name, *args])
-        result.check_returncode()
-        print(f"Script {self.script_name} executed successully")
+        try:
+            logger.info(f"Executing script: {self.script_name} {' '.join([str(x) for x in args])}")
+            cmd = ["sudo", "bash", self.script_name, *args]
+            result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, check=True)
+            logger.info(f"Script {self.script_name} executed successully")
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Error executing script {self.script_name}.\n Error: {e.stdout.decode('utf-8')}")    
+
+        # print(f"Execute script: {self.script_name} {' '.join([str(x) for x in args])}")
+        # result = subprocess.run(["sudo", "bash", self.script_name, *args])
+        # result.check_returncode()
+        # print(f"Script {self.script_name} executed successully")
 
 
 class ResourceConfig:
@@ -156,18 +175,18 @@ def main(args):
         ExecuteBashScript("./start_slurm.sh").run(node_type, ",".join(controllers))
 
         ## Note: Uncomment the below lines to install docker and enroot.
-        # ExecuteBashScript("./utils/install_docker.sh").run()
-        # ExecuteBashScript("./utils/install_enroot_pyxis.sh").run(node_type)
+        ExecuteBashScript("./utils/install_docker.sh").run()
+        ExecuteBashScript("./utils/install_enroot_pyxis.sh").run(node_type)
 
-        # # Note: Uncomment the below lines to install DCGM Exporter and EFA Node Exporter and Cluster Nodes. (Docker must also be installed above)
-        # if node_type == SlurmNodeType.COMPUTE_NODE:
-        #     ExecuteBashScript("./utils/install_dcgm_exporter.sh").run()
-        #     ExecuteBashScript("./utils/install_efa_node_exporter.sh").run()
+        # Note: Uncomment the below lines to install DCGM Exporter and EFA Node Exporter and Cluster Nodes. (Docker must also be installed above)
+        if node_type == SlurmNodeType.COMPUTE_NODE:
+            ExecuteBashScript("./utils/install_dcgm_exporter.sh").run()
+            ExecuteBashScript("./utils/install_efa_node_exporter.sh").run()
 
-        # # Note: Uncomment the below lines to install Slurm Exporter and Prometheus on the Controller Node.
-        # if node_type == SlurmNodeType.HEAD_NODE:
-        #     ExecuteBashScript("./utils/install_slurm_exporter.sh").run()
-        #     ExecuteBashScript("./utils/install_prometheus.sh").run()
+        # Note: Uncomment the below lines to install Slurm Exporter and Prometheus on the Controller Node.
+        if node_type == SlurmNodeType.HEAD_NODE:
+            ExecuteBashScript("./utils/install_slurm_exporter.sh").run()
+            ExecuteBashScript("./utils/install_prometheus.sh").run()
 
     print("[INFO]: Success: All provisioning scripts completed")
 
